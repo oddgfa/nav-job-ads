@@ -1,5 +1,5 @@
 package com.example.jobads.application
 
 interface JobAdsClient {
-    fun getJobAds()
+    fun getJobAds(): List<JobAd>
 }
