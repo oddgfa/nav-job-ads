@@ -1,13 +1,13 @@
-package com.example.blackjack
+package com.example.jobads
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class BlackjackApplication
+class JobAdsApplication
 
 fun main(args: Array<String>) {
-    runApplication<BlackjackApplication>(*args) {
-        addInitializers(blackjackProdBeans)
+    runApplication<JobAdsApplication>(*args) {
+        addInitializers(jobAdsProdBeans)
     }
 }
