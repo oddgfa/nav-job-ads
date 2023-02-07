@@ -2,7 +2,6 @@ package com.example.jobads.infrastructure
 
 import com.example.jobads.application.JobAd
 import com.example.jobads.application.JobAdsClient
-import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import java.net.URI
@@ -14,7 +13,9 @@ class HttpJobAdsClient(
     private val baseUri: URI,
     private val authToken: String,
 ) : JobAdsClient {
-    // pair.second is true if this was the last list
+    /**
+     * @return The second pair returns the current page and a boolean representing if we have reached the last page.
+     */
     override fun getJobAds(from: OffsetDateTime, to: OffsetDateTime, page: Int): Pair<List<JobAd>, Pair<Int, Boolean>> {
         val uri =
             baseUri.resolve("/public-feed/api/v1/ads?published=[${from.toLocalDateTime()},${to.toLocalDateTime()}]&page=$page&size=20")
@@ -30,37 +31,9 @@ class HttpJobAdsClient(
                 }
                 ?: (emptyList<JobAd>() to (0 to true))
         }.getOrElse {
+            // The application runs out of buffer space/memory, so we'll ignore the error and stop fetching pages.
             println(it)
             (emptyList<JobAd>() to (0 to true))
         }
     }
-}
-
-data class AdsJsonResponse(
-    val content: List<AdJsonResponse>,
-    val totalElements: Int,
-    val pageNumber: Int,
-    val totalPages: Int,
-    val first: Boolean,
-    val last: Boolean,
-    val sort: String,
-)
-
-data class AdJsonResponse(
-    val uuid: String,
-    val title: String,
-    @JsonProperty("jobtitle")
-    val jobTitle: String?,
-    val description: String,
-    val published: OffsetDateTime,
-    val expires: OffsetDateTime,
-) {
-    fun toDomain(): JobAd = JobAd(
-        uuid = uuid,
-        title = title,
-        jobTitle = jobTitle,
-        description = description,
-        published = published,
-        expires = expires,
-    )
 }
