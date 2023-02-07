@@ -14,16 +14,25 @@ class HttpJobAdsClient(
     private val baseUri: URI,
     private val authToken: String,
 ) : JobAdsClient {
-    override fun getJobAds(): List<JobAd> {
-        return webClient.get()
-            .uri(baseUri.resolve("/public-feed/api/v1/ads"))
-            .header("Authorization", "Bearer $authToken")
-            .retrieve()
-            .bodyToMono<AdsJsonResponse>()
-            .block(Duration.ofSeconds(10))
-            ?.content
-            ?.map(AdJsonResponse::toDomain)
-            ?: emptyList()
+    // pair.second is true if this was the last list
+    override fun getJobAds(from: OffsetDateTime, to: OffsetDateTime, page: Int): Pair<List<JobAd>, Pair<Int, Boolean>> {
+        val uri =
+            baseUri.resolve("/public-feed/api/v1/ads?published=[${from.toLocalDateTime()},${to.toLocalDateTime()}]&page=$page&size=20")
+        return runCatching {
+            webClient.get()
+                .uri(uri)
+                .header("Authorization", "Bearer $authToken")
+                .retrieve()
+                .bodyToMono<AdsJsonResponse>()
+                .block(Duration.ofSeconds(10))
+                ?.let {
+                    it.content.map(AdJsonResponse::toDomain) to (it.pageNumber to it.last)
+                }
+                ?: (emptyList<JobAd>() to (0 to true))
+        }.getOrElse {
+            println(it)
+            (emptyList<JobAd>() to (0 to true))
+        }
     }
 }
 

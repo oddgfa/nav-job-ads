@@ -2,6 +2,7 @@ package com.example.jobads.application
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.time.OffsetDateTime
@@ -31,8 +32,8 @@ class KotlinVsJavaTest {
                 expires = OffsetDateTime.of(2023, 2, 1, 0, 0, 0, 0, ZoneOffset.UTC)
             )
         )
-        whenever(jobAdsClient.getJobAds())
-            .thenReturn(jobAds)
+        whenever(jobAdsClient.getJobAds(any(), any(), any()))
+            .thenReturn(jobAds to (0 to true))
 
         val result = kotlinVsJava.kotlinVsJava()
 
@@ -60,8 +61,8 @@ class KotlinVsJavaTest {
                 expires = OffsetDateTime.of(2023, 2, 1, 0, 0, 0, 0, ZoneOffset.UTC)
             )
         )
-        whenever(jobAdsClient.getJobAds())
-            .thenReturn(jobAds)
+        whenever(jobAdsClient.getJobAds(any(), any(), any()))
+            .thenReturn(jobAds to (0 to true))
 
         val result = kotlinVsJava.kotlinVsJava()
 
@@ -92,8 +93,8 @@ class KotlinVsJavaTest {
                 expires = OffsetDateTime.of(2023, 2, 1, 0, 0, 0, 0, ZoneOffset.UTC)
             )
         )
-        whenever(jobAdsClient.getJobAds())
-            .thenReturn(jobAds)
+        whenever(jobAdsClient.getJobAds(any(), any(), any()))
+            .thenReturn(jobAds to (0 to true))
 
         val result = kotlinVsJava.kotlinVsJava()
 
