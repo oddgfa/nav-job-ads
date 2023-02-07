@@ -1,5 +1,6 @@
 package com.example.jobads.application
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import java.time.temporal.WeekFields
 import java.util.*
 
@@ -22,6 +23,8 @@ class KotlinVsJava(
                 }
             }
         }
+
+        println(ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(count))
 
         return count
     }
