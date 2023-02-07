@@ -17,10 +17,6 @@ class KotlinVsJava(
         do {
             val result = jobAdsClient.getJobAds(halfAYearAgo, now, pageNumber)
 
-            if (result.first.isEmpty()) {
-                return acc
-            }
-
             pageNumber = result.second.first + 1
             val jobAds = result.first
                 .groupBy {

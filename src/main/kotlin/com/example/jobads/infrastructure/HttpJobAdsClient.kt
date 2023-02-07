@@ -31,9 +31,9 @@ class HttpJobAdsClient(
                 }
                 ?: (emptyList<JobAd>() to (0 to true))
         }.getOrElse {
-            // The application runs out of buffer space/memory, so we'll ignore the error and stop fetching pages.
+            // Print and ignore any errors to get an approximate
             println(it)
-            (emptyList<JobAd>() to (0 to true))
+            (emptyList<JobAd>() to (page to false))
         }
     }
 }
