@@ -12,35 +12,30 @@ class KotlinVsJava(
         val now = OffsetDateTime.now()
         val halfAYearAgo = now.minusMonths(6)
 
-        val acc = mutableMapOf<String, KotlinVsJavaCount>()
-        var pageNumber = 0
-        do {
-            val result = jobAdsClient.getJobAds(halfAYearAgo, now, pageNumber)
-
-            pageNumber = result.second.first + 1
-            val jobAds = result.first
-                .groupBy {
-                    val weekOfYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear()
+        val count = jobAdsClient.getJobAds(halfAYearAgo, now)
+            .fold(mutableMapOf<String, KotlinVsJavaCount>()) { acc, jobAds ->
+                val weekOfYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear()
+                val grouped = jobAds.groupBy {
                     "${it.published.year}-${it.published.get(weekOfYear)}"
                 }
 
-            val count = jobAds.mapValues {
-                it.value.fold(KotlinVsJavaCount(0, 0)) { acc, jobAd ->
-                    when {
-                        jobAd.contains("kotlin") -> KotlinVsJavaCount(acc.kotlin + 1, acc.java)
-                        jobAd.contains("java") -> KotlinVsJavaCount(acc.kotlin, acc.java + 1)
-                        else -> acc
+
+                val count = grouped.mapValues {
+                    it.value.fold(KotlinVsJavaCount(0, 0)) { acc, jobAd ->
+                        val kotlinCount = if (jobAd.contains("kotlin")) 1 else 0
+                        val javaCount = if (jobAd.contains("java")) 1 else 0
+                        acc + KotlinVsJavaCount(kotlinCount, javaCount)
                     }
                 }
+
+                count.forEach { (k, v) -> acc.merge(k, v) { oldVal, newVal -> oldVal + newVal } }
+
+                acc
             }
 
-            count.forEach { (k, v) -> acc.merge(k, v) { oldVal, newVal -> oldVal + newVal } }
-            println(pageNumber)
-        } while (!result.second.second)
+        println(ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(count))
 
-        println(ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(acc))
-
-        return acc
+        return count
     }
 }
 

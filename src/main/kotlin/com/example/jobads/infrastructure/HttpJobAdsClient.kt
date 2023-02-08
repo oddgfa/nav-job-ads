@@ -16,7 +16,7 @@ class HttpJobAdsClient(
     /**
      * @return The second pair returns the current page and a boolean representing if we have reached the last page.
      */
-    override fun getJobAds(from: OffsetDateTime, to: OffsetDateTime, page: Int): Pair<List<JobAd>, Pair<Int, Boolean>> {
+    fun getJobAds(from: OffsetDateTime, to: OffsetDateTime, page: Int): Pair<List<JobAd>, Pair<Int, Boolean>> {
         val uri =
             baseUri.resolve("/public-feed/api/v1/ads?published=[${from.toLocalDateTime()},${to.toLocalDateTime()}]&page=$page&size=20")
         return runCatching {
@@ -31,9 +31,12 @@ class HttpJobAdsClient(
                 }
                 ?: (emptyList<JobAd>() to (0 to true))
         }.getOrElse {
-            // Print and ignore any errors to get an approximate
+            // Print and ignore any errors so we at least get the approximate result on an error
             println(it)
             (emptyList<JobAd>() to (page to false))
         }
+    }
+    override fun getJobAds(from: OffsetDateTime, to: OffsetDateTime): Sequence<List<JobAd>> {
+        return JobAdsIterator(this, from, to, 0)
     }
 }

@@ -32,8 +32,8 @@ class KotlinVsJavaTest {
                 expires = OffsetDateTime.of(2023, 2, 1, 0, 0, 0, 0, ZoneOffset.UTC)
             )
         )
-        whenever(jobAdsClient.getJobAds(any(), any(), any()))
-            .thenReturn(jobAds to (0 to true))
+        whenever(jobAdsClient.getJobAds(any(), any()))
+            .thenReturn(sequenceOf(jobAds))
 
         val result = kotlinVsJava.kotlinVsJava()
 
@@ -61,8 +61,8 @@ class KotlinVsJavaTest {
                 expires = OffsetDateTime.of(2023, 2, 1, 0, 0, 0, 0, ZoneOffset.UTC)
             )
         )
-        whenever(jobAdsClient.getJobAds(any(), any(), any()))
-            .thenReturn(jobAds to (0 to true))
+        whenever(jobAdsClient.getJobAds(any(), any()))
+            .thenReturn(sequenceOf(jobAds))
 
         val result = kotlinVsJava.kotlinVsJava()
 
@@ -93,13 +93,43 @@ class KotlinVsJavaTest {
                 expires = OffsetDateTime.of(2023, 2, 1, 0, 0, 0, 0, ZoneOffset.UTC)
             )
         )
-        whenever(jobAdsClient.getJobAds(any(), any(), any()))
-            .thenReturn(jobAds to (0 to true))
+        whenever(jobAdsClient.getJobAds(any(), any()))
+            .thenReturn(sequenceOf(jobAds))
 
         val result = kotlinVsJava.kotlinVsJava()
 
         assertThat(result).isEqualTo(
             mapOf("2023-5" to KotlinVsJavaCount(0, 0))
+        )
+    }
+
+
+    @Test
+    fun `should count both if both keywords are present`() {
+        val jobAds = listOf(
+            JobAd(
+                uuid = "1",
+                title = "Kotlin developer",
+                jobTitle = null,
+                description = "I meant a Java developer",
+                published = OffsetDateTime.of(2023, 2, 1, 0, 0, 0, 0, ZoneOffset.UTC),
+                expires = OffsetDateTime.of(2023, 2, 1, 0, 0, 0, 0, ZoneOffset.UTC)
+            ), JobAd(
+                uuid = "2",
+                title = "Java developer",
+                jobTitle = null,
+                description = "I need a Java developer",
+                published = OffsetDateTime.of(2023, 2, 1, 0, 0, 0, 0, ZoneOffset.UTC),
+                expires = OffsetDateTime.of(2023, 2, 1, 0, 0, 0, 0, ZoneOffset.UTC)
+            )
+        )
+        whenever(jobAdsClient.getJobAds(any(), any()))
+            .thenReturn(sequenceOf(jobAds))
+
+        val result = kotlinVsJava.kotlinVsJava()
+
+        assertThat(result).isEqualTo(
+            mapOf("2023-5" to KotlinVsJavaCount(1, 2))
         )
     }
 }
