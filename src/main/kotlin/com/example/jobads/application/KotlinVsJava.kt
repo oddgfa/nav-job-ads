@@ -46,7 +46,7 @@ class KotlinVsJava(
     }
 
     private fun groupByWeek(jobAds: List<JobAd>): Map<String, List<JobAd>> {
-        val weekOfYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear()
+        val weekOfYear = WeekFields.of(Locale.forLanguageTag("no")).weekOfWeekBasedYear()
         val grouped = jobAds.groupBy {
             "${it.published.year}-${it.published.get(weekOfYear)}"
         }

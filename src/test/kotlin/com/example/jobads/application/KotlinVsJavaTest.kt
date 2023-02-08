@@ -69,7 +69,7 @@ class KotlinVsJavaTest {
         assertThat(result).isEqualTo(
             mapOf(
                 "2023-5" to KotlinVsJavaCount(0, 1),
-                "2022-26" to KotlinVsJavaCount(1, 0),
+                "2022-27" to KotlinVsJavaCount(1, 0),
             )
         )
     }
